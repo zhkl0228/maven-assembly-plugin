@@ -306,6 +306,8 @@ public class AddArtifactTask
                             ||
                             entry.getName().startsWith( "android/lib/" )
                             ||
+                            "natives/linux_64/libunicorn_java.so".equals( entry.getName() )
+                            ||
                             entry.getName().startsWith( "natives/windows_" ) )
                     {
                         if ( "so".equalsIgnoreCase( ext )
