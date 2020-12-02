@@ -230,7 +230,9 @@ public class AddArtifactTask
                     JarEntry entry = entries.nextElement();
                     final String ext = FilenameUtils.getExtension( entry.getName() );
 
-                    if ( entry.getName().startsWith( "android/sdk19/" ) )
+                    if ( entry.getName().startsWith( "android/sdk19/" )
+                            ||
+                            entry.getName().startsWith( "android/sdk23/lib/" ) )
                     {
                         System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
                         jarUpdated = true;
