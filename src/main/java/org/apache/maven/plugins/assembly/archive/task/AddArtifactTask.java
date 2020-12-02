@@ -19,6 +19,7 @@ package org.apache.maven.plugins.assembly.archive.task;
  * under the License.
  */
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugins.assembly.AssemblerConfigurationSource;
 import org.apache.maven.plugins.assembly.archive.ArchiveCreationException;
@@ -36,9 +37,15 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarOutputStream;
 
 /**
  *
@@ -162,7 +169,7 @@ public class AddArtifactTask
 
         try
         {
-            final File artifactFile = artifact.getFile();
+            final File artifactFile = processArtifactFile( artifact.getFile() );
 
             logger.debug(
                 "Adding artifact: " + artifact.getId() + " with file: " + artifactFile + " to assembly location: "
@@ -177,11 +184,178 @@ public class AddArtifactTask
                 archiver.addFile( artifactFile, outputLocation );
             }
         }
-        catch ( final ArchiverException e )
+        catch ( final ArchiverException | IOException e )
         {
             throw new ArchiveCreationException(
                 "Error adding file '" + artifact.getId() + "' to archive: " + e.getMessage(), e );
         }
+    }
+
+    private File processArtifactFile( File artifactFile ) throws IOException
+    {
+        if ( !"jar".equalsIgnoreCase( FilenameUtils.getExtension( artifactFile.getName() ) ) )
+        {
+            return artifactFile;
+        }
+        if ( !artifactFile.canRead() )
+        {
+            return artifactFile;
+        }
+
+        // Create file descriptors for the jar and a temp jar.
+
+        File tempJarFile = File.createTempFile( FilenameUtils.getBaseName( artifactFile.getName() ), ".jar" );
+
+        // Initialize a flag that will indicate that the jar was updated.
+
+        boolean jarUpdated = false;
+
+        try ( JarFile jar = new JarFile( artifactFile ) )
+        {
+            // Allocate a buffer for reading entry data.
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            try ( JarOutputStream tempJar =
+                         new JarOutputStream( new FileOutputStream( tempJarFile ) ) )
+            {
+                // Loop through the jar entries and add them to the temp jar,
+                // skipping the entry that was added to the temp jar already.
+
+                for ( Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements(); )
+                {
+                    // Get the next entry.
+
+                    JarEntry entry = entries.nextElement();
+                    final String ext = FilenameUtils.getExtension( entry.getName() );
+
+                    if ( entry.getName().startsWith( "android/sdk19/" ) )
+                    {
+                        System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
+                        jarUpdated = true;
+                        continue;
+                    }
+
+                    if ( artifactFile.getName().startsWith( "capstone-" )
+                            ||
+                            artifactFile.getName().startsWith( "keystone-" ) )
+                    {
+                        if ( entry.getName().startsWith( "win32-x86/" )
+                                ||
+                                entry.getName().startsWith( "darwin/" )
+                                ||
+                                entry.getName().startsWith( "win32-x86-64/" ) )
+                        {
+                            System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
+                            jarUpdated = true;
+                            continue;
+                        }
+                    }
+
+                    if ( entry.getName().startsWith( "com/sun/jna/win32-x86/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/aix-ppc64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/darwin/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-x86/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-arm/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-armel/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-aarch64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-ppc/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-ppc64le/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-mips64el/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-s390x/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/sunos-x86/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/sunos-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/sunos-sparc/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/sunos-sparcv9/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/freebsd-x86/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/freebsd-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/openbsd-x86/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/openbsd-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/win32-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/aix-ppc/" ) )
+                    {
+                        System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
+                        jarUpdated = true;
+                        continue;
+                    }
+
+                    if ( entry.getName().startsWith( "natives/osx_64/lib" )
+                            ||
+                            entry.getName().startsWith( "android/lib/" )
+                            ||
+                            entry.getName().startsWith( "natives/windows_" ) )
+                    {
+                        if ( "so".equalsIgnoreCase( ext )
+                                ||
+                                "dylib".equalsIgnoreCase( ext )
+                                ||
+                                "dll".equalsIgnoreCase( ext ) )
+                        {
+                            System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
+                            jarUpdated = true;
+                            continue;
+                        }
+                    }
+
+                    /*if ( entry.getSize() > 64 * 1024 && !"class".equals( ext ) )
+                    {
+                        System.out.println( "artifactFile=" + artifactFile + ", entry=" + entry );
+                    }*/
+
+                    // Get an input stream for the entry.
+
+                    try ( InputStream entryStream = jar.getInputStream( entry ) )
+                    {
+                        // Read the entry and write it to the temp jar.
+
+                        tempJar.putNextEntry( new JarEntry( entry.getName() ) );
+
+                        while ( ( bytesRead = entryStream.read( buffer ) ) != -1 )
+                        {
+                            tempJar.write( buffer, 0, bytesRead );
+                        }
+                    }
+                }
+            }
+        } finally
+        {
+            // If the jar was not updated, delete the temp jar file.
+
+            if ( jarUpdated )
+            {
+                tempJarFile.deleteOnExit();
+            }
+            else
+            {
+                if ( !tempJarFile.delete() )
+                {
+                    tempJarFile.deleteOnExit();
+                }
+            }
+        }
+
+        return jarUpdated ? tempJarFile : artifactFile;
     }
 
     private void unpacked( Archiver archiver, String destDirectory )
