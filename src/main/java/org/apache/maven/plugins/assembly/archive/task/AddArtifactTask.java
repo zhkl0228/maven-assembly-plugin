@@ -41,6 +41,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -191,6 +193,8 @@ public class AddArtifactTask
         }
     }
 
+    private static final Map<String, File> CLASS_MAP = new HashMap<>();
+
     private File processArtifactFile( File artifactFile ) throws IOException
     {
         if ( !"jar".equalsIgnoreCase( FilenameUtils.getExtension( artifactFile.getName() ) ) )
@@ -322,10 +326,25 @@ public class AddArtifactTask
                         }
                     }
 
-                    /*if ( entry.getSize() > 64 * 1024 && !"class".equals( ext ) )
+                    boolean isClass = "class".equals( ext );
+                    if ( entry.getSize() >= 64 * 1024 && !isClass )
                     {
                         System.out.println( "artifactFile=" + artifactFile + ", entry=" + entry );
-                    }*/
+                    }
+
+                    if ( isClass
+                            &&
+                            CLASS_MAP.containsKey( entry.getName() ) )
+                    {
+                        File oldArtifactFile = CLASS_MAP.get( entry.getName() );
+                        System.out.println( "Duplicate entry=" + entry
+                                + ", oldArtifactFile=" + oldArtifactFile
+                                + ", artifactFile=" + artifactFile );
+                    }
+                    else if ( isClass )
+                    {
+                        CLASS_MAP.put( entry.getName(), artifactFile );
+                    }
 
                     // Get an input stream for the entry.
 
