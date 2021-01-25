@@ -251,6 +251,8 @@ public class AddArtifactTask
                                 ||
                                 entry.getName().startsWith( "darwin/" )
                                 ||
+                                entry.getName().startsWith( "linux-aarch64/" )
+                                ||
                                 entry.getName().startsWith( "win32-x86-64/" ) )
                         {
                             System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
@@ -308,6 +310,8 @@ public class AddArtifactTask
 
                     if ( entry.getName().startsWith( "natives/osx_64/lib" )
                             ||
+                            entry.getName().startsWith( "natives/osx_arm64/lib" )
+                            ||
                             entry.getName().startsWith( "android/lib/" )
                             ||
                             "natives/linux_64/libunicorn_java.so".equals( entry.getName() )
@@ -329,7 +333,9 @@ public class AddArtifactTask
                     boolean isClass = "class".equals( ext );
                     if ( entry.getSize() >= 64 * 1024 && !isClass )
                     {
-                        System.out.println( "artifactFile=" + artifactFile + ", entry=" + entry );
+                        System.out.println( "Entry size greater than 64K entry=" + entry
+                                + " => " + ( entry.getSize() / 1024 ) + "K"
+                                + ", artifactFile=" + artifactFile );
                     }
 
                     if ( isClass
