@@ -316,11 +316,15 @@ public class AddArtifactTask
                             ||
                             "natives/linux_64/libunicorn_java.so".equals( entry.getName() )
                             ||
+                            entry.getName().startsWith( "natives/linux_arm64/lib" )
+                            ||
                             entry.getName().startsWith( "natives/windows_" ) )
                     {
                         if ( "so".equalsIgnoreCase( ext )
                                 ||
                                 "dylib".equalsIgnoreCase( ext )
+                                ||
+                                "jnilib".equalsIgnoreCase( ext )
                                 ||
                                 "dll".equalsIgnoreCase( ext ) )
                         {
