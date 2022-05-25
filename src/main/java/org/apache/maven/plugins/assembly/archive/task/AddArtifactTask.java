@@ -267,6 +267,10 @@ public class AddArtifactTask
                             ||
                             entry.getName().startsWith( "com/sun/jna/darwin/" )
                             ||
+                            entry.getName().startsWith( "com/sun/jna/darwin-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/darwin-aarch64/" )
+                            ||
                             entry.getName().startsWith( "com/sun/jna/linux-x86/" )
                             ||
                             entry.getName().startsWith( "com/sun/jna/linux-arm/" )
@@ -282,6 +286,8 @@ public class AddArtifactTask
                             entry.getName().startsWith( "com/sun/jna/linux-mips64el/" )
                             ||
                             entry.getName().startsWith( "com/sun/jna/linux-s390x/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/linux-riscv64/" )
                             ||
                             entry.getName().startsWith( "com/sun/jna/sunos-x86/" )
                             ||
@@ -300,6 +306,8 @@ public class AddArtifactTask
                             entry.getName().startsWith( "com/sun/jna/openbsd-x86-64/" )
                             ||
                             entry.getName().startsWith( "com/sun/jna/win32-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/win32-aarch64/" )
                             ||
                             entry.getName().startsWith( "com/sun/jna/aix-ppc/" ) )
                     {
