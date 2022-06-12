@@ -316,6 +316,31 @@ public class AddArtifactTask
                         continue;
                     }
 
+                    if ( entry.getName().startsWith( "org/sqlite/native/DragonFlyBSD/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux/ppc64/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux/android-arm/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux/arm" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux/x86/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux/aarch64/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux-Alpine/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Windows/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/FreeBSD/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Mac/" ) )
+                    {
+                        System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
+                        jarUpdated = true;
+                        continue;
+                    }
+
                     if ( entry.getName().startsWith( "natives/osx_64/lib" )
                             ||
                             entry.getName().startsWith( "natives/osx_arm64/lib" )
