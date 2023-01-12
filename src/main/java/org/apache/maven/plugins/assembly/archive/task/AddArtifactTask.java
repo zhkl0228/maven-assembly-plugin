@@ -334,6 +334,10 @@ public class AddArtifactTask
                             ||
                             entry.getName().startsWith( "org/sqlite/native/FreeBSD/" )
                             ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux-Android/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux-Musl/" )
+                            ||
                             entry.getName().startsWith( "org/sqlite/native/Mac/" ) )
                     {
                         System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
