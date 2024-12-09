@@ -309,6 +309,12 @@ public class AddArtifactTask
                             ||
                             entry.getName().startsWith( "com/sun/jna/win32-aarch64/" )
                             ||
+                            entry.getName().startsWith( "com/sun/jna/linux-loongarch64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/dragonflybsd-x86-64/" )
+                            ||
+                            entry.getName().startsWith( "com/sun/jna/freebsd-aarch64/" )
+                            ||
                             entry.getName().startsWith( "com/sun/jna/aix-ppc/" ) )
                     {
                         System.out.println( "Skip " + artifactFile.getName() + ": " + entry.getName() );
@@ -337,6 +343,8 @@ public class AddArtifactTask
                             entry.getName().startsWith( "org/sqlite/native/Linux-Android/" )
                             ||
                             entry.getName().startsWith( "org/sqlite/native/Linux-Musl/" )
+                            ||
+                            entry.getName().startsWith( "org/sqlite/native/Linux/riscv64/" )
                             ||
                             entry.getName().startsWith( "org/sqlite/native/Mac/" ) )
                     {
