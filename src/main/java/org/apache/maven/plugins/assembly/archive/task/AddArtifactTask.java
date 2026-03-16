@@ -37,10 +37,10 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Enumeration;
@@ -222,7 +222,7 @@ public class AddArtifactTask
             int bytesRead;
 
             try ( JarOutputStream tempJar =
-                         new JarOutputStream( new FileOutputStream( tempJarFile ) ) )
+                         new JarOutputStream( Files.newOutputStream( tempJarFile.toPath() ) ) )
             {
                 // Loop through the jar entries and add them to the temp jar,
                 // skipping the entry that was added to the temp jar already.
@@ -440,7 +440,7 @@ public class AddArtifactTask
     {
         String outputLocation = destDirectory;
 
-        if ( ( outputLocation.length() > 0 ) && !outputLocation.endsWith( "/" ) )
+        if ( ( !outputLocation.isEmpty() ) && !outputLocation.endsWith( "/" ) )
         {
             outputLocation += "/";
         }
