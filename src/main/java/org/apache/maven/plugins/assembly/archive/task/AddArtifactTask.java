@@ -382,9 +382,8 @@ public class AddArtifactTask
                     boolean isClass = "class".equals( ext );
                     if ( entry.getSize() >= 64 * 1024 && !isClass )
                     {
-                        System.out.println( "Entry size greater than 64K entry=" + entry
-                                + " => " + ( entry.getSize() / 1024 ) + "K"
-                                + ", artifactFile=" + artifactFile );
+                        System.out.printf( "Entry size greater than 64K[%dK] entry=%s, artifactFile=%s%n",
+                                entry.getSize() / 1024, entry, artifactFile );
                     }
 
                     if ( isClass
